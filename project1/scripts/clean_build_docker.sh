@@ -1,19 +1,11 @@
-#!/bin/bash
+#!/bin/bash -ex
 
-sudo docker image rm $(sudo docker image ls --format '{{.Repository}} {{.ID}}' | grep 'sekwonlee' | awk '{print $2}')
+# sudo docker image rm $(sudo docker image ls --format '{{.Repository}} {{.ID}}' | grep 'sekwonlee' | awk '{print $2}')
 
-cd dockerfiles
+sudo docker build . -f dockerfiles/base.dockerfile -t sekwonlee/kvs:base --network=host
 
-sudo docker build . -f base.dockerfile -t sekwonlee/kvs:base --network=host
-sudo docker push sekwonlee/kvs:base
+sudo docker build . -f dockerfiles/client.dockerfile -t hannah:client --network=host
 
-sudo docker build . -f client.dockerfile -t sekwonlee/kvs:client --network=host
-sudo docker push sekwonlee/kvs:client
+sudo docker build . -f dockerfiles/frontend.dockerfile -t hannah:frontend --network=host
 
-sudo docker build . -f frontend.dockerfile -t sekwonlee/kvs:frontend --network=host
-sudo docker push sekwonlee/kvs:frontend
-
-sudo docker build . -f server.dockerfile -t sekwonlee/kvs:server --network=host
-sudo docker push sekwonlee/kvs:server
-
-cd ..
+sudo docker build . -f dockerfiles/server.dockerfile -t hannah:server --network=host

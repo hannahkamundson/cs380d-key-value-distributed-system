@@ -4,6 +4,7 @@ import sys
 import tarfile
 from tempfile import TemporaryFile
 import yaml
+import traceback
 
 import kubernetes as k8s
 from kubernetes.stream import stream
@@ -49,6 +50,7 @@ def run_process(command, current_workdir):
 
         Make sure to clean up the cluster object and state store before
         recreating the cluster.''')
+        traceback.print_exc()
         sys.exit(1)
 
 def run_background_process(command, current_workdir):

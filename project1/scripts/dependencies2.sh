@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 sysctl -w net.ipv4.ip_forward=1 && ufw disable && \
     ln -Tfs /usr/bin/python3 /usr/bin/python

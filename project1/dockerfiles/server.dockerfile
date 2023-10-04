@@ -1,8 +1,8 @@
 FROM sekwonlee/kvs:base
 
-MAINTAINER Sekwon Lee <sklee@cs.utexas.edu> version: 0.1
-
 USER root
+
+COPY server.py $KVS_HOME/
 
 WORKDIR $KVS_HOME
 

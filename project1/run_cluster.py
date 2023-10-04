@@ -1,6 +1,5 @@
 import argparse
 import os
-import subprocess
 
 import random
 import xmlrpc.client
@@ -31,7 +30,7 @@ def add_nodes(k8s_client, k8s_apps_client, node_type, num_nodes, prefix=None):
             server_spec['metadata']['labels']['role'] = 'server-%d' % serverUID
             k8s_client.create_namespaced_pod(namespace=util.NAMESPACE, body=server_spec)
             util.check_wait_pod_status(k8s_client, 'role=server-%d' % serverUID, 'Running')
-            result = frontend.addServer(serverUID)
+            frontend.addServer(serverUID)
             serverUID += 1
         elif node_type == 'client':
             client_spec = util.load_yaml('yaml/pods/client-pod.yml', prefix)
@@ -92,12 +91,12 @@ def init_cluster(k8s_client, k8s_apps_client, num_client, num_server, ssh_key, p
     k8s_client.create_namespaced_pod(namespace=util.NAMESPACE, body=frontend_spec)
     util.check_wait_pod_status(k8s_client, 'role=frontend', 'Running')
     frontend = xmlrpc.client.ServerProxy(baseAddr + str(baseFrontendPort))
-
-    print('Creating server pods...')
-    add_nodes(k8s_client, k8s_apps_client, 'server', num_server, prefix)
-
+    
     print('Creating client pods...')
     add_nodes(k8s_client, k8s_apps_client, 'client', num_client, prefix)
+    
+    print('Creating server pods...')
+    add_nodes(k8s_client, k8s_apps_client, 'server', num_server, prefix)
 
 def event_trigger(k8s_client, k8s_apps_client, prefix):
     terminate = False

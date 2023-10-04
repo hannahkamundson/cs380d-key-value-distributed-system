@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 if [[ -z "$1" ]]; then
     echo "Usage: ./create_cluster_object.sh path-to-ssh-key"
@@ -29,7 +29,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 #sudo docker login
 
 #sudo kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
-#sudo kubectl create secret generic regcred --from-file=.dockerconfigjson=/root/.docker/config.json --type=kubernetes.io/dockerconfigjson
+#sudo kubectl create secret generic regcred --from-file=.dockerconfigjson=/root/.docker/config.json --type=kubernetes.io/dockerconfigjsonecho $
 #sudo kubectl taint nodes master0 node-role.kubernetes.io/master:NoSchedule-
 sudo kubectl label nodes master0 role=general
 

@@ -17,18 +17,18 @@ our KVS cluster orchestrated by Kubernetes over a baremetal machine.
 
 ```
 $ cd ~/; mkdir projects; cd projects
-$ git clone https://github.com/vijay03/cs380d-f23.git
+$ git clone https://github.com/vijay03/cs380d-f23.gitsudo
 $ cd cs380d-f23/project1
 ```
 
 ### Install dependencies
-
+<!-- 10.0.2.15 -->
 ```
 $ bash scripts/dependencies.sh
 ```
 
 ### Configure OS environment variables & SSH
-
+ss
 There are a few environment variables that should be configured according to your own environment.
 
 1. `$KVS_HOME`: Path to the project root directory.
@@ -52,7 +52,7 @@ Add the public key to `known_hosts`.
 $ ssh-keyscan [your local machine's ip address] >> $HOME/.ssh/known_hosts
 ```
 
-
+10.0.2.15
 ### Install Kubernetes
 
 Change the ip addresses in the following file to the ip address of your local machine.
@@ -74,6 +74,8 @@ $ kubectl get nodes
 NAME      STATUS   ROLES                  AGE   VERSION
 master0   Ready    control-plane,master   20h   v1.22.2
 ```
+
+172.17.0.1
 
 ### Build docker images
 We employ multiple docker container instances to simulate distributed environments in our local
