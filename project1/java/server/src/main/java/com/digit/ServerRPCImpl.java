@@ -1,8 +1,11 @@
 package com.digit;
+import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.digit.server.ServerRPC;
+import com.digit.server.ServerRPCClient;
+
 public class ServerRPCImpl implements ServerRPC {
 
     private final Map<Integer, Integer> data = new ConcurrentHashMap<>();
@@ -54,9 +57,14 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public String sendValuesToServer(int serverId) {
-        // TODO: send all the values in the map to the server
-        // Use ServerRPCClient.create() to get the rpc and then loop through the data sending one at a time (unless
-        // we want to add a batch function)
+        try {
+            ServerRPC newServer = ServerRPCClient.create(serverId);
+            for (Map.Entry<Integer,Integer> entry : data.entrySet()){
+                newServer.put(entry.getKey(),entry.getValue());
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
         return "Success";
     }
 }

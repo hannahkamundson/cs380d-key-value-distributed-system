@@ -56,7 +56,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         servers.put(serverId, serverRpc);
 
         // Send locks to all the servers
-        ServerLock.lock()
+        ServerLock.lock();
 
         // Tell one server to send all data to other server
 
