@@ -9,12 +9,20 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public String put(int key, int value) {
-        return "Receive a get request: Key = " + key + ", Val = " + value;
+        data.put(key,value);
+        return "Receive a get request: Key = " + Integer.toString(key) + ", Val = " + Integer.toString(value);
     }
 
     @Override
     public String get(int key) {
-        return "Receive a get request: Key = " + key;
+        Integer value = data.get(key);
+        String readKey = "";
+        if (value == null){
+            readKey = Integer.toString(key) + "does not have a value yet!";
+        }else {
+            readKey = "Receive a get request: Key = " + Integer.toString(key);
+        }
+        return readKey;
     }
 
     @Override
@@ -27,6 +35,7 @@ public class ServerRPCImpl implements ServerRPC {
         }
         return keyValues.toString();
     }
+
 
     @Override
     public String shutdownServer() {
