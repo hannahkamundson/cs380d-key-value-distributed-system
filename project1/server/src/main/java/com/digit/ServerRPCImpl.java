@@ -1,9 +1,16 @@
 package com.digit;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ServerRPCImpl implements ServerRPC {
+
+    private final Map<Integer, Integer> servers = new ConcurrentHashMap<>();
 
     @Override
     public String put(int key, int value) {
+
+
         return "Receive a get request: Key = " + key + ", Val = " + value;
     }
 
@@ -13,12 +20,28 @@ public class ServerRPCImpl implements ServerRPC {
     }
 
     @Override
-    public String printKVPairs(int serverId) {
-        return "Receive a request printing all KV pairs stored in this server";
+    public String printKVPairs() {
+        StringBuilder keyValues = new StringBuilder();
+        for (Map.Entry<Integer,Integer> entry : servers.entrySet()){
+            String key = Integer.toString(entry.getKey());
+            String value = Integer.toString(entry.getValue());
+            keyValues.append("key = " + key + " ,value = " + value);
+        }
+        return keyValues.toString();
     }
 
     @Override
     public String shutdownServer(int serverId) {
         return "Receive a request for a normal shutdown";
+    }
+
+    @Override
+    public boolean lock() {
+        return false;
+    }
+
+    @Override
+    public boolean unlock() {
+        return false;
     }
 }

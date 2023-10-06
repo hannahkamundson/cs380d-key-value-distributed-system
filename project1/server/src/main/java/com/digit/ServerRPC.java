@@ -6,8 +6,12 @@ public interface ServerRPC {
 
     String get(int key);
 
-    String printKVPairs(int serverId);
+    String printKVPairs();
 
     String shutdownServer(int serverId);
+
+    boolean lock();
+
+    boolean unlock();
 
 }
