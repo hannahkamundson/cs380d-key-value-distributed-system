@@ -17,6 +17,7 @@ public class FrontendRPCImpl implements FrontendRPC {
     @Override
     public String put(int key, int value) {
         // TODO do we need to do a copy of this?
+        // TODO: what happens if a server dies in the middle of this?
         ServerLock.runWithLock(servers.values(), rpc -> rpc.put(key, value));
         return String.format("Success %s=%s", key, value);
     }
@@ -24,7 +25,7 @@ public class FrontendRPCImpl implements FrontendRPC {
     @Override
     public String get(int key) {
         int serverId = ServerSelector.select(key, servers.keySet());
-        return String.valueOf(servers.get(serverId).get(key));
+        return servers.get(serverId).get(key);
     }
 
     @Override
@@ -54,7 +55,6 @@ public class FrontendRPCImpl implements FrontendRPC {
             return String.format("The port is not accepting messages: %s: ", serverId) + e.getMessage();
         }
 
-
         Collection<ServerRPC> rpcs = servers.values();
 
         // Make sure we have another server
@@ -73,7 +73,7 @@ public class FrontendRPCImpl implements FrontendRPC {
 
         // Create the RPC client for the new port
         servers.put(serverId, serverRpc);
-        
+
         // Unlock all servers
         ServerLock.unlock(rpcs);
 

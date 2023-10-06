@@ -21,7 +21,7 @@ public class ServerRPCImpl implements ServerRPC {
         Integer value = data.get(key);
         String readKey = "";
         if (value == null){
-            readKey = Integer.toString(key) + "does not have a value yet!";
+            readKey = Integer.toString(key) + " does not have a value yet!";
         }else {
             readKey = "Receive a get request: Key = " + Integer.toString(key);
         }
