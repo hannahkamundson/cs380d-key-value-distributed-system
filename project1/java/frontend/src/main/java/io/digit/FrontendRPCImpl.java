@@ -5,7 +5,9 @@ import com.digit.server.ServerRPCClient;
 import io.digit.server.ServerLock;
 import io.digit.server.ServerSelector;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -52,15 +54,28 @@ public class FrontendRPCImpl implements FrontendRPC {
             return String.format("The port is not accepting messages: %s: ", serverId) + e.getMessage();
         }
 
+
+        Collection<ServerRPC> rpcs = servers.values();
+
+        // Make sure we have another server
+        Optional<Integer> sendingServerId = servers.keySet().stream().findFirst();
+
+        // If there aren't any other servers, we don't need to move data over
+        if (sendingServerId.isEmpty()) {
+            return "Success";
+        }
+
+        // Send locks to all the servers
+        ServerLock.lock(rpcs);
+
+        // Tell one server to send all data to other server
+        servers.get(sendingServerId.get()).sendValuesToServer(serverId);
+
         // Create the RPC client for the new port
         servers.put(serverId, serverRpc);
 
-        // Send locks to all the servers
-        ServerLock.lock()
-
-        // Tell one server to send all data to other server
-
         // Unlock all servers
+        ServerLock.unlock(rpcs);
 
         return "Success";
     }

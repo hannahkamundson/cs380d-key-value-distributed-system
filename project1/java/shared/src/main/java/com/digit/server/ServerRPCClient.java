@@ -23,5 +23,5 @@ public class ServerRPCClient {
             client.setConfig(config);
             ClientFactory factory = new ClientFactory(client);
             return (ServerRPC) factory.newInstance(ServerRPC.class);
-        }
+    }
 }
