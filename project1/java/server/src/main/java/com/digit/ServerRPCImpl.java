@@ -1,5 +1,8 @@
 package com.digit;
 
+
+import com.digit.server.ServerRPC;
+
 public class ServerRPCImpl implements ServerRPC {
 
     @Override
@@ -13,12 +16,22 @@ public class ServerRPCImpl implements ServerRPC {
     }
 
     @Override
-    public String printKVPairs(int serverId) {
+    public String printKVPairs() {
         return "Receive a request printing all KV pairs stored in this server";
     }
 
     @Override
-    public String shutdownServer(int serverId) {
+    public String shutdownServer() {
         return "Receive a request for a normal shutdown";
+    }
+
+    @Override
+    public boolean lock() {
+        return true;
+    }
+
+    @Override
+    public boolean unlock() {
+        return true;
     }
 }

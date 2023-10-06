@@ -1,6 +1,6 @@
 package com.digit.util;
 
-import com.digit.ServerRPC;
+import com.digit.server.ServerRPC;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;

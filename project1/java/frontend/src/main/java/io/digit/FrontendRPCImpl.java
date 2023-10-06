@@ -1,5 +1,6 @@
 package io.digit;
 
+import com.digit.server.ServerRPC;
 import io.digit.server.ServerRPCClient;
 import io.digit.server.ServerSelector;
 
@@ -9,20 +10,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class FrontendRPCImpl implements FrontendRPC {
-    private final Map<Integer, DummyServerRpc> servers = new ConcurrentHashMap<>();
+    private final Map<Integer, ServerRPC> servers = new ConcurrentHashMap<>();
 
     @Override
     public String put(int key, int value) {
-        Collection<DummyServerRpc> rpcs = servers.values();
+        Collection<ServerRPC> rpcs = servers.values();
         // First we need to tell all servers to lock
         // TODO: is this actually in parallel or do we need to work with threads
-        rpcs.parallelStream().forEach(DummyServerRpc::lock);
+        rpcs.parallelStream().forEach(ServerRPC::lock);
 
         // Then we need to write the value
         rpcs.parallelStream().forEach(rpc -> rpc.put(key, value));
 
         // Then we need to unlock
-        rpcs.parallelStream().forEach(DummyServerRpc::unlock);
+        rpcs.parallelStream().forEach(ServerRPC::unlock);
         return String.format("Success %s=%s", key, value);
     }
 
@@ -34,7 +35,7 @@ public class FrontendRPCImpl implements FrontendRPC {
 
     @Override
     public String printKVPairs(int serverId) {
-        DummyServerRpc serverRpc = servers.get(serverId);
+        ServerRPC serverRpc = servers.get(serverId);
 
         // Make sure the server exists
         if (serverRpc == null) {
@@ -51,7 +52,7 @@ public class FrontendRPCImpl implements FrontendRPC {
             return String.format("The server already exists: %s", serverId);
         }
 
-        DummyServerRpc serverRpc;
+        ServerRPC serverRpc;
 
         try {
             serverRpc = ServerRPCClient.create(serverId);
@@ -72,7 +73,7 @@ public class FrontendRPCImpl implements FrontendRPC {
 
     @Override
     public String shutdownServer(int serverId) {
-        DummyServerRpc serverRpc = servers.get(serverId);
+        ServerRPC serverRpc = servers.get(serverId);
 
         // Male sure the server exists
         if (serverRpc == null) {

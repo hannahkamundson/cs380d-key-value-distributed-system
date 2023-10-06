@@ -1,6 +1,6 @@
 package io.digit.server;
 
-import io.digit.DummyServerRpc;
+import com.digit.server.ServerRPC;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.util.ClientFactory;
@@ -15,7 +15,7 @@ public class ServerRPCClient {
     private static final String BASE_HOST = "http://localhost:";
     private static final int BASE_SERVER_PORT = 9000;
 
-    public static DummyServerRpc create(int serverId)  throws MalformedURLException {
+    public static ServerRPC create(int serverId)  throws MalformedURLException {
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
             int serverPort = BASE_SERVER_PORT + serverId;
             config.setServerURL(new URL(String.join(BASE_HOST, ":", String.valueOf(serverPort))));
@@ -24,6 +24,6 @@ public class ServerRPCClient {
             client.setConfig(config);
             ClientFactory factory = new ClientFactory(client);
             // TODO
-            return (DummyServerRpc) factory.newInstance(DummyServerRpc.class);
+            return (ServerRPC) factory.newInstance(ServerRPC.class);
         }
 }

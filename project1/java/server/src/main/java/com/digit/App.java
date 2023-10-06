@@ -1,5 +1,6 @@
 package com.digit;
 
+import com.digit.server.ServerRPC;
 import com.digit.util.ProcessorFactoryFactory;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -13,8 +14,7 @@ import org.apache.xmlrpc.webserver.WebServer;
 import java.io.IOException;
 
 
-public class App  {
-
+public class App {
     private static final int Base_Port = 9000;
     private static int serverId = 0;
 
@@ -29,12 +29,11 @@ public class App  {
                 .help("Server id (required)")
                 .dest("serverId")
                 .required(true);
-        Namespace ns = null;
+        Namespace ns;
         try {
             ns = parser.parseArgs(args);
         } catch (ArgumentParserException e) {
-            parser.handleError(e);
-            System.exit(1);
+            throw new RuntimeException(e);
         }
 
         serverId = ns.getInt("serverId");
