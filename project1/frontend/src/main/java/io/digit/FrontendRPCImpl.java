@@ -36,7 +36,7 @@ public class FrontendRPCImpl implements FrontendRPC {
     public String printKVPairs(int serverId) {
         DummyServerRpc serverRpc = servers.get(serverId);
 
-        // Male sure the server exists
+        // Make sure the server exists
         if (serverRpc == null) {
             return String.format("The server is not registered: %s", serverId);
         }

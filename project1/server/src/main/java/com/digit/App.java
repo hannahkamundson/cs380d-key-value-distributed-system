@@ -3,22 +3,11 @@ package com.digit;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
-import org.apache.xmlrpc.server.XmlRpcServer;
-import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 
@@ -56,7 +45,7 @@ public class App  {
 
 
         PropertyHandlerMapping propertyHandlerMapping = new PropertyHandlerMapping();
-        propertyHandlerMapping.addHandler("default", ServerRPCImpl.class);
+        propertyHandlerMapping.addHandler("default", ServerRPC.class);
 
         // Start the server and add the handler mapping
         WebServer webServer = new WebServer(Base_Port);
