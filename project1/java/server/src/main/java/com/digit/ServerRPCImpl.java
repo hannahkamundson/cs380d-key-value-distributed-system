@@ -1,25 +1,19 @@
 package com.digit;
-import java.net.MalformedURLException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.digit.server.ServerRPC;
 import com.digit.server.ServerRPCClient;
 
+import java.net.MalformedURLException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ServerRPCImpl implements ServerRPC {
 
     private final Map<Integer, Integer> data = new ConcurrentHashMap<>();
-    private static boolean isLocked;
+    private static boolean isLocked = false;
 
     @Override
     public String put(int key, int value) {
-        while (isLocked) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
         data.put(key,value);
         return "Receive a get request: Key = " + Integer.toString(key) + ", Val = " + Integer.toString(value);
     }
@@ -34,10 +28,10 @@ public class ServerRPCImpl implements ServerRPC {
             }
         }
         Integer value = data.get(key);
-        String readKey = "";
+        String readKey;
         if (value == null){
             readKey = Integer.toString(key) + " does not have a value yet!";
-        }else {
+        } else {
             readKey = "Receive a get request: Key = " + Integer.toString(key);
         }
         return readKey;
@@ -63,14 +57,14 @@ public class ServerRPCImpl implements ServerRPC {
     @Override
     public boolean lock() {
         isLocked = true;
-        return isLocked;
+        return true;
     }
 
     @Override
     public boolean unlock() {
         isLocked = false;
         notifyAll();
-        return isLocked;
+        return true;
     }
 
     @Override

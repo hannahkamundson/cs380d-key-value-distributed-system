@@ -14,11 +14,19 @@ import java.util.stream.Collectors;
 public class FrontendRPCImpl implements FrontendRPC {
     private final Map<Integer, ServerRPC> servers = new ConcurrentHashMap<>();
 
+    /**
+     * Don't try to lock the servers more than once at a time
+     */
+    private final Object serversLockingLock = new Object();
+
     @Override
     public String put(int key, int value) {
         // TODO do we need to do a copy of this?
         // TODO: what happens if a server dies in the middle of this?
-        ServerLock.runWithLock(servers.values(), rpc -> rpc.put(key, value));
+        synchronized (serversLockingLock) {
+            ServerLock.runWithLock(servers.values(), rpc -> rpc.put(key, value));
+        }
+
         return String.format("Success %s=%s", key, value);
     }
 
@@ -65,17 +73,19 @@ public class FrontendRPCImpl implements FrontendRPC {
             return "Success";
         }
 
-        // Send locks to all the servers
-        ServerLock.lock(rpcs);
+        synchronized (serversLockingLock) {
+            // Send locks to all the servers
+            ServerLock.lock(rpcs);
 
-        // Tell one server to send all data to other server
-        servers.get(sendingServerId.get()).sendValuesToServer(serverId);
+            // Tell one server to send all data to other server
+            servers.get(sendingServerId.get()).sendValuesToServer(serverId);
 
-        // Create the RPC client for the new port
-        servers.put(serverId, serverRpc);
+            // Create the RPC client for the new port
+            servers.put(serverId, serverRpc);
 
-        // Unlock all servers
-        ServerLock.unlock(rpcs);
+            // Unlock all servers
+            ServerLock.unlock(rpcs);
+        }
 
         return "Success";
     }
