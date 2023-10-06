@@ -23,7 +23,6 @@ public class ServerRPCClient {
             XmlRpcClient client = new XmlRpcClient();
             client.setConfig(config);
             ClientFactory factory = new ClientFactory(client);
-            // TODO
             return (ServerRPC) factory.newInstance(ServerRPC.class);
         }
 }
