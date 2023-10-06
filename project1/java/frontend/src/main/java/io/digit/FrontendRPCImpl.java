@@ -73,7 +73,7 @@ public class FrontendRPCImpl implements FrontendRPC {
 
         // Create the RPC client for the new port
         servers.put(serverId, serverRpc);
-
+        
         // Unlock all servers
         ServerLock.unlock(rpcs);
 
