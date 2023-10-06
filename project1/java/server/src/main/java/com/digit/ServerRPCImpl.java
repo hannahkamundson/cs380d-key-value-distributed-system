@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.digit.server.ServerRPC;
 public class ServerRPCImpl implements ServerRPC {
 
-    private final Map<Integer, Integer> servers = new ConcurrentHashMap<>();
+    private final Map<Integer, Integer> data = new ConcurrentHashMap<>();
 
     @Override
     public String put(int key, int value) {
@@ -29,10 +29,10 @@ public class ServerRPCImpl implements ServerRPC {
     @Override
     public String printKVPairs() {
         StringBuilder keyValues = new StringBuilder();
-        for (Map.Entry<Integer,Integer> entry : servers.entrySet()){
+        for (Map.Entry<Integer,Integer> entry : data.entrySet()){
             String key = Integer.toString(entry.getKey());
             String value = Integer.toString(entry.getValue());
-            keyValues.append("key = " + key + " ,value = " + value);
+            keyValues.append("key = ").append(key).append(" ,value = ").append(value);
         }
         return keyValues.toString();
     }
