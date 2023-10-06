@@ -23,7 +23,7 @@ public class FrontendRPCServerImpl implements FrontendRPCServer {
     
     @Override
     public String listServer() {
-        return "Returning the list of servers";
+        return "I changed this";
     }
 
     @Override
