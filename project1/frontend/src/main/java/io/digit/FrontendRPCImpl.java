@@ -1,34 +1,88 @@
 package io.digit;
 
-public class FrontendRPCServerImpl implements FrontendRPCServer {
+import io.digit.server.ServerRPCClient;
+import io.digit.server.ServerSelector;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+public class FrontendRPCImpl implements FrontendRPC {
+    private final Map<Integer, DummyServerRpc> servers = new ConcurrentHashMap<>();
+
     @Override
     public String put(int key, int value) {
-        return String.format("Put key %s with value %s", key, value);
+        Collection<DummyServerRpc> rpcs = servers.values();
+        // First we need to tell all servers to lock
+        // TODO: is this actually in parallel or do we need to work with threads
+        rpcs.parallelStream().forEach(DummyServerRpc::lock);
+
+        // Then we need to write the value
+        rpcs.parallelStream().forEach(rpc -> rpc.put(key, value));
+
+        // Then we need to unlock
+        rpcs.parallelStream().forEach(DummyServerRpc::unlock);
+        return String.format("Success %s=%s", key, value);
     }
 
     @Override
     public String get(int key) {
-        return String.format("Getting key %s", key);
+        int serverId = ServerSelector.select(key, servers.keySet());
+        return String.valueOf(servers.get(serverId).get(key));
     }
 
     @Override
     public String printKVPairs(int serverId) {
-        return "Printing the KVs";
+        DummyServerRpc serverRpc = servers.get(serverId);
+
+        // Male sure the server exists
+        if (serverRpc == null) {
+            return String.format("The server is not registered: %s", serverId);
+        }
+
+        return serverRpc.printKVPairs();
     }
 
     @Override
     public String addServer(int serverId) {
-        return String.format("Adding server %s", serverId);
+        // Make sure we aren't overwriting a server
+        if (servers.containsKey(serverId)) {
+            return String.format("The server already exists: %s", serverId);
+        }
+
+        DummyServerRpc serverRpc;
+
+        try {
+            serverRpc = ServerRPCClient.create(serverId);
+        } catch (Exception e) {
+            return String.format("The port is not accepting messages: %s: ", serverId) + e.getMessage();
+        }
+
+        // Create the RPC client for the new port
+        servers.put(serverId, serverRpc);
+
+        return "Success";
     }
     
     @Override
     public String listServer() {
-        return "I changed this";
+        return "[" + servers.keySet().stream().map(Object::toString).collect(Collectors.joining(" ")) + "]";
     }
 
     @Override
     public String shutdownServer(int serverId) {
-        return String.format("Shutting down server %s", serverId);
+        DummyServerRpc serverRpc = servers.get(serverId);
+
+        // Male sure the server exists
+        if (serverRpc == null) {
+            return String.format("The server is not registered: %s", serverId);
+        }
+
+        // Shut it down before removing it from our list and then remove it
+        String message = serverRpc.shutdownServer();
+        servers.remove(serverId);
+
+        return message;
     }
-    
 }

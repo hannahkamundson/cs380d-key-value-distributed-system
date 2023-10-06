@@ -5,7 +5,7 @@ import xmlrpc.server
 clientId = 0
 basePort = 7000
 
-frontend = xmlrpc.client.ServerProxy("http://localhost:8001")
+frontend = xmlrpc.client.ServerProxy("http://localhost:8001").default
 
 class ClientRPCServer:
     def put(self, key, value):

@@ -90,7 +90,7 @@ def init_cluster(k8s_client, k8s_apps_client, num_client, num_server, ssh_key, p
     env = frontend_spec['spec']['containers'][0]['env']
     k8s_client.create_namespaced_pod(namespace=util.NAMESPACE, body=frontend_spec)
     util.check_wait_pod_status(k8s_client, 'role=frontend', 'Running')
-    frontend = xmlrpc.client.ServerProxy(baseAddr + str(baseFrontendPort))
+    frontend = xmlrpc.client.ServerProxy(baseAddr + str(baseFrontendPort)).default
     
     print('Creating client pods...')
     add_nodes(k8s_client, k8s_apps_client, 'client', num_client, prefix)

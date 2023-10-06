@@ -1,6 +1,6 @@
 package io.digit;
 
-public interface FrontendRPCServer {
+public interface FrontendRPC {
 
     /**
      * This function routes requests from clients to proper servers that are responsible for inserting a new key-value 
