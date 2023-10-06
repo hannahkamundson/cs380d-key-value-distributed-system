@@ -1,6 +1,5 @@
-package io.digit.server;
+package com.digit.server;
 
-import com.digit.server.ServerRPC;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.util.ClientFactory;

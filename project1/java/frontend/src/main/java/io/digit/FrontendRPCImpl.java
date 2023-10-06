@@ -1,10 +1,10 @@
 package io.digit;
 
 import com.digit.server.ServerRPC;
-import io.digit.server.ServerRPCClient;
+import com.digit.server.ServerRPCClient;
+import io.digit.server.ServerLock;
 import io.digit.server.ServerSelector;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -14,16 +14,8 @@ public class FrontendRPCImpl implements FrontendRPC {
 
     @Override
     public String put(int key, int value) {
-        Collection<ServerRPC> rpcs = servers.values();
-        // First we need to tell all servers to lock
-        // TODO: is this actually in parallel or do we need to work with threads
-        rpcs.parallelStream().forEach(ServerRPC::lock);
-
-        // Then we need to write the value
-        rpcs.parallelStream().forEach(rpc -> rpc.put(key, value));
-
-        // Then we need to unlock
-        rpcs.parallelStream().forEach(ServerRPC::unlock);
+        // TODO do we need to do a copy of this?
+        ServerLock.runWithLock(servers.values(), rpc -> rpc.put(key, value));
         return String.format("Success %s=%s", key, value);
     }
 
@@ -62,6 +54,13 @@ public class FrontendRPCImpl implements FrontendRPC {
 
         // Create the RPC client for the new port
         servers.put(serverId, serverRpc);
+
+        // Send locks to all the servers
+        ServerLock.lock()
+
+        // Tell one server to send all data to other server
+
+        // Unlock all servers
 
         return "Success";
     }

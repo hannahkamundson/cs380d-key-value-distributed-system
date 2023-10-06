@@ -14,4 +14,5 @@ public interface ServerRPC {
 
     boolean unlock();
 
+    String sendValuesToServer(int portNumber);
 }

@@ -9,8 +9,6 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public String put(int key, int value) {
-
-
         return "Receive a get request: Key = " + key + ", Val = " + value;
     }
 
@@ -43,5 +41,13 @@ public class ServerRPCImpl implements ServerRPC {
     @Override
     public boolean unlock() {
         return true;
+    }
+
+    @Override
+    public String sendValuesToServer(int serverId) {
+        // TODO: send all the values in the map to the server
+        // Use ServerRPCClient.create() to get the rpc and then loop through the data sending one at a time (unless
+        // we want to add a batch function)
+        return "Success";
     }
 }
