@@ -1,15 +1,16 @@
-package io.digit;
+package com.digit.util;
 
+import com.digit.ServerRPC;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
 
 public class ProcessorFactoryFactory implements RequestProcessorFactoryFactory {
     private final RequestProcessorFactory factory = new ProcessorFactory();
-    private final FrontendRPC echo;
+    private final ServerRPC rpc;
 
-    public ProcessorFactoryFactory(FrontendRPC echo) {
-        this.echo = echo;
+    public ProcessorFactoryFactory(ServerRPC rpc) {
+        this.rpc = rpc;
     }
 
     public RequestProcessorFactory getRequestProcessorFactory(Class aClass) throws XmlRpcException {
@@ -19,7 +20,7 @@ public class ProcessorFactoryFactory implements RequestProcessorFactoryFactory {
     private class ProcessorFactory implements RequestProcessorFactory {
         public Object getRequestProcessor(XmlRpcRequest xmlRpcRequest)
                 throws XmlRpcException {
-            return echo;
+            return rpc;
         }
     }
 }

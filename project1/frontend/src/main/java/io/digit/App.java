@@ -1,5 +1,6 @@
 package io.digit;
 
+import io.digit.util.ProcessorFactoryFactory;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
