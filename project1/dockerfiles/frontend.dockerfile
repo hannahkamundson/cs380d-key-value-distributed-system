@@ -1,8 +1,14 @@
 # Build stage
 FROM maven:3.8.6-openjdk-11-slim AS build
 # Copy the code over
-COPY frontend/src /home/app/src/
-COPY frontend/pom.xml /home/app/
+COPY java/frontend/src /home/app/frontend/src/
+COPY java/frontend/pom.xml /home/app/frontend/
+COPY java/pom.xml /home/app/
+COPY java/shared/src /home/app/shared/src/
+COPY java/shared/pom.xml /home/app/shared/
+COPY java/server/src /home/app/server/src
+COPY java/server/pom.xml /home/app/server/
+
 RUN mvn -f /home/app/pom.xml install
 
 # Package stage
