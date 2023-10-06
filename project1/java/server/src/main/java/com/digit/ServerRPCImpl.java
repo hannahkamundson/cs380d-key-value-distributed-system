@@ -9,15 +9,30 @@ import com.digit.server.ServerRPCClient;
 public class ServerRPCImpl implements ServerRPC {
 
     private final Map<Integer, Integer> data = new ConcurrentHashMap<>();
+    private static boolean isLocked;
 
     @Override
     public String put(int key, int value) {
+        while (isLocked) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         data.put(key,value);
         return "Receive a get request: Key = " + Integer.toString(key) + ", Val = " + Integer.toString(value);
     }
 
     @Override
     public String get(int key) {
+        while (isLocked) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         Integer value = data.get(key);
         String readKey = "";
         if (value == null){
@@ -47,12 +62,15 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public boolean lock() {
-        return true;
+        isLocked = true;
+        return isLocked;
     }
 
     @Override
     public boolean unlock() {
-        return true;
+        isLocked = false;
+        notifyAll();
+        return isLocked;
     }
 
     @Override
