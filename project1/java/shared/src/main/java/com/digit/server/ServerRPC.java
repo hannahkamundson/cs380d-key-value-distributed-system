@@ -8,7 +8,7 @@ public interface ServerRPC {
 
     String printKVPairs();
 
-    String shutdownServer(int serverId);
+    String shutdownServer();
 
     boolean lock();
 

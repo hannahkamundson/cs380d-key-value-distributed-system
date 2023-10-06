@@ -25,7 +25,7 @@ public class ServerRPCImpl implements ServerRPC {
         for (Map.Entry<Integer,Integer> entry : servers.entrySet()){
             String key = Integer.toString(entry.getKey());
             String value = Integer.toString(entry.getValue());
-            keyValues.append("key = " + key + " ,value = " + value);
+            keyValues.append("key = ").append(key).append(" ,value = ").append(value);
         }
         return keyValues.toString();
     }
