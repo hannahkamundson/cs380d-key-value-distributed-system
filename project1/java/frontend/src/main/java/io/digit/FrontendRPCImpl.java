@@ -57,6 +57,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         log.info("Adding server {}", serverId);
         // Make sure we aren't overwriting a server
         if (servers.containsKey(serverId)) {
+            log.info("The server already had the server id {}", serverId);
             return String.format("The server already exists: %s", serverId);
         }
 
@@ -65,6 +66,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         try {
             serverRpc = ServerRPCClient.create(serverId);
         } catch (Exception e) {
+            log.error("There was an error creating the server rpc {}", serverId);
             return String.format("The port is not accepting messages: %s: ", serverId) + e.getMessage();
         }
 
@@ -75,6 +77,7 @@ public class FrontendRPCImpl implements FrontendRPC {
 
         // If there aren't any other servers, we don't need to move data over
         if (sendingServerId.isEmpty()) {
+            servers.put(serverId, serverRpc);
             log.info("Successfully added server {}", serverId);
             return "Success";
         }

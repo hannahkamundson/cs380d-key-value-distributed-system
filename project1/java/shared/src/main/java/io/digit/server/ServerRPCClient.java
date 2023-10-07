@@ -14,14 +14,18 @@ public class ServerRPCClient {
     private static final String BASE_HOST = "http://localhost:";
     private static final int BASE_SERVER_PORT = 9000;
 
-    public static ServerRPC create(int serverId)  throws MalformedURLException {
+    public static ServerRPC create(int serverId) throws MalformedURLException {
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-            int serverPort = BASE_SERVER_PORT + serverId;
+            int serverPort = ServerRPCClient.serverPort(serverId);
             config.setServerURL(new URL(String.join(BASE_HOST, ":", String.valueOf(serverPort))));
             config.setEnabledForExtensions(true);
             XmlRpcClient client = new XmlRpcClient();
             client.setConfig(config);
             ClientFactory factory = new ClientFactory(client);
             return (ServerRPC) factory.newInstance(ServerRPC.class);
+    }
+
+    public static int serverPort(int serverId) {
+        return BASE_SERVER_PORT + serverId;
     }
 }

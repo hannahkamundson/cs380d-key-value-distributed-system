@@ -1,6 +1,7 @@
 package io.digit;
 
 import io.digit.server.ServerRPC;
+import io.digit.server.ServerRPCClient;
 import io.digit.util.ProcessorFactoryFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -49,7 +50,7 @@ public class App {
         propertyHandlerMapping.addHandler("default", ServerRPC.class);
 
         // Start the server and add the handler mapping
-        WebServer webServer = new WebServer(Base_Port);
+        WebServer webServer = new WebServer(ServerRPCClient.serverPort(serverId));
         XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
 
         xmlRpcServer.setHandlerMapping(propertyHandlerMapping);
