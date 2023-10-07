@@ -1,9 +1,10 @@
 package io.digit;
 
-import com.digit.server.ServerRPC;
-import com.digit.server.ServerRPCClient;
-import io.digit.server.ServerLock;
+import io.digit.server.ServerRPC;
+import io.digit.server.ServerRPCClient;
+import io.digit.server.ServerLockUtil;
 import io.digit.server.ServerSelector;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class FrontendRPCImpl implements FrontendRPC {
     private final Map<Integer, ServerRPC> servers = new ConcurrentHashMap<>();
 
@@ -21,12 +23,14 @@ public class FrontendRPCImpl implements FrontendRPC {
 
     @Override
     public String put(int key, int value) {
+        log.info("Starting putting key value {} {}", key, value);
         // TODO do we need to do a copy of this?
         // TODO: what happens if a server dies in the middle of this?
         synchronized (serversLockingLock) {
-            ServerLock.runWithLock(servers.values(), rpc -> rpc.put(key, value));
+            ServerLockUtil.runWithLock(servers.values(), rpc -> rpc.put(key, value));
         }
 
+        log.info("Completed putting key value {} {}", key, value);
         return String.format("Success %s=%s", key, value);
     }
 
@@ -50,6 +54,7 @@ public class FrontendRPCImpl implements FrontendRPC {
 
     @Override
     public String addServer(int serverId) {
+        log.info("Adding server {}", serverId);
         // Make sure we aren't overwriting a server
         if (servers.containsKey(serverId)) {
             return String.format("The server already exists: %s", serverId);
@@ -70,12 +75,13 @@ public class FrontendRPCImpl implements FrontendRPC {
 
         // If there aren't any other servers, we don't need to move data over
         if (sendingServerId.isEmpty()) {
+            log.info("Successfully added server {}", serverId);
             return "Success";
         }
 
         synchronized (serversLockingLock) {
             // Send locks to all the servers
-            ServerLock.lock(rpcs);
+            ServerLockUtil.lock(rpcs);
 
             // Tell one server to send all data to other server
             servers.get(sendingServerId.get()).sendValuesToServer(serverId);
@@ -84,8 +90,10 @@ public class FrontendRPCImpl implements FrontendRPC {
             servers.put(serverId, serverRpc);
 
             // Unlock all servers
-            ServerLock.unlock(rpcs);
+            ServerLockUtil.unlock(rpcs);
         }
+
+        log.info("Successfully added server {}", serverId);
 
         return "Success";
     }

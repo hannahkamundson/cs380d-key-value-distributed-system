@@ -14,9 +14,10 @@ RUN mvn -f /home/app/pom.xml install
 # Package stage
 FROM openjdk:11-jre-slim
 ENV KVS_HOME /cs380d-f23/project1
-COPY --from=build /home/app/target/server-1.0-SNAPSHOT.jar ${KVS_HOME}/server.jar
+COPY --from=build /home/app/server/target/server-1.0-SNAPSHOT.jar ${KVS_HOME}/server.jar
 
 USER root
 WORKDIR $KVS_HOME
 
-ENTRYPOINT ["java","-jar", "server.jar"]
+# ENTRYPOINT ["java", "-jar", "server.jar", "-i", "$SERVER_ID"]
+ENTRYPOINT java -jar server.jar -i ${SERVER_ID}
