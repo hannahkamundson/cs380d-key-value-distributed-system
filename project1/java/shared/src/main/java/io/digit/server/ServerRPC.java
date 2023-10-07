@@ -1,4 +1,4 @@
-package com.digit.server;
+package io.digit.server;
 
 public interface ServerRPC {
 

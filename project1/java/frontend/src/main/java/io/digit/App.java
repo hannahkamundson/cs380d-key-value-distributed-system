@@ -1,6 +1,7 @@
 package io.digit;
 
 import io.digit.util.ProcessorFactoryFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
@@ -8,6 +9,7 @@ import org.apache.xmlrpc.webserver.WebServer;
 
 import java.io.IOException;
 
+@Slf4j
 public class App {
     private static final int PORT = 8001;
 
@@ -26,6 +28,7 @@ public class App {
         XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
 
         xmlRpcServer.setHandlerMapping(propertyHandlerMapping);
+        log.info("Starting the server");
         webServer.start();
     }
 }

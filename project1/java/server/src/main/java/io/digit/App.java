@@ -1,7 +1,8 @@
-package com.digit;
+package io.digit;
 
-import com.digit.server.ServerRPC;
-import com.digit.util.ProcessorFactoryFactory;
+import io.digit.server.ServerRPC;
+import io.digit.util.ProcessorFactoryFactory;
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -12,21 +13,22 @@ import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.webserver.WebServer;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 
+@Slf4j
 public class App {
     private static final int Base_Port = 9000;
     private static int serverId = 0;
     static WebServer webServer = null;
 
     // TODO: Do we want it to die when there is an exception? I'd think not
-    public static void main( String[] args ) throws XmlRpcException, IOException {
+    public static void main(String[] args) throws XmlRpcException, IOException {
+        log.info("Passed the following arguments {}", Arrays.toString(args));
         ArgumentParser parser = ArgumentParsers.newFor("App").build().defaultHelp(true)
                 .description("To be Added");
-        parser.addArgument("-i", "--id")
-                .nargs(1)
+        parser.addArgument("--id", "-i")
                 .type(Integer.class)
-                .metavar("I")
                 .help("Server id (required)")
                 .dest("serverId")
                 .required(true);
@@ -38,6 +40,7 @@ public class App {
         }
 
         serverId = ns.getInt("serverId");
+        log.info("Setting server ID to {}", serverId);
 
         PropertyHandlerMapping propertyHandlerMapping = new PropertyHandlerMapping();
         // Create a new process factory, so we can maintain state across rpc calls
@@ -51,6 +54,7 @@ public class App {
         XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
 
         xmlRpcServer.setHandlerMapping(propertyHandlerMapping);
+        log.info("Starting server");
         webServer.start();
     }
 }

@@ -1,11 +1,9 @@
 package io.digit.server;
 
-import com.digit.server.ServerRPC;
-
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class ServerLock {
+public class ServerLockUtil {
     public static void runWithLock(Collection<ServerRPC> rpcs, Consumer<ServerRPC> fn) {
         // TODO: is this actually in parallel or do we need to work with threads
         lock(rpcs);
