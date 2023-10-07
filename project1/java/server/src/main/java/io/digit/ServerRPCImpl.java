@@ -16,17 +16,21 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public String put(int key, int value) {
+        log.info("Starting putting key value {} {}", key, value);
         data.put(key,value);
+        log.info("Completed putting key value {} {}", key, value);
         return String.format("Receive a get request: Key = %s, Val = %s, key, value", key, value);
     }
 
     @Override
     public String get(int key) {
+        log.info("Starting getting key's value {}", key);
         while (isLocked) {
             try {
                 log.info("Waiting until lock opens");
                 wait();
             } catch (InterruptedException e) {
+                log.info("Runtime Err while waiting for lock to open during get");
                 throw new RuntimeException(e);
             }
         }
@@ -38,25 +42,29 @@ public class ServerRPCImpl implements ServerRPC {
         } else {
             readKey = String.format("Receive a get request: Key = %s, value=%s", key, value);
         }
-
+        log.info("Completed getting key's value {}", key);
         return readKey;
     }
 
     @Override
     public String printKVPairs() {
+        log.info("Starting to print key-value pairs");
         StringBuilder keyValues = new StringBuilder();
         for (Map.Entry<Integer,Integer> entry : data.entrySet()){
             String key = Integer.toString(entry.getKey());
             String value = Integer.toString(entry.getValue());
             keyValues.append("key = ").append(key).append(" ,value = ").append(value);
         }
+        log.info("Completed storing key-value pairs as string");
         return keyValues.toString();
     }
 
 
     @Override
     public String shutdownServer() {
+        log.info("Starting shutting down the server");
         App.webServer.shutdown();
+        log.info("Completed shutting down the server");
         return "Success";
     }
 
@@ -83,10 +91,12 @@ public class ServerRPCImpl implements ServerRPC {
         log.info("Sending values to the server ID {}", serverId);
         try {
             ServerRPC newServer = ServerRPCClient.create(serverId);
+            log.info("Starting to send the values to the new server {}", serverId);
             for (Map.Entry<Integer,Integer> entry : data.entrySet()){
                 newServer.put(entry.getKey(),entry.getValue());
             }
         } catch (MalformedURLException e) {
+            log.info("Runtime Err while trying to send values to new server. {}", serverId);
             throw new RuntimeException(e);
         }
 
@@ -96,6 +106,7 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public boolean alive() {
+        log.info("Checking whether the server is alive");
         return true;
     }
 }
