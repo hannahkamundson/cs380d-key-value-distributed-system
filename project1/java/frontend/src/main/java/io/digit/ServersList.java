@@ -6,5 +6,5 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServersList {
-    static Map<Integer, ServerRPC> servers = new ConcurrentHashMap<>();
+    static final Map<Integer, ServerRPC> servers = new ConcurrentHashMap<>();
 }

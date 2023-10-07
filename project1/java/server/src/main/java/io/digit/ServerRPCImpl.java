@@ -30,7 +30,7 @@ public class ServerRPCImpl implements ServerRPC {
                 throw new RuntimeException(e);
             }
         }
-        log.info("Thread has been notified. Key will be returned for {}", key);
+        log.info("Thread has been awakened. Key will be returned for {}", key);
         Integer value = data.get(key);
         String readKey;
         if (value == null){

@@ -54,7 +54,6 @@ public class FrontendRPCImpl implements FrontendRPC {
     public String addServer(int serverId) {
         log.info("Adding server {}", serverId);
         // Make sure we aren't overwriting a server
-            log.info("The server already had the server id {}", serverId);
         if (ServersList.servers.containsKey(serverId)) {
             return String.format("The server already exists: %s", serverId);
         }
@@ -64,7 +63,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         try {
             serverRpc = ServerRPCClient.create(serverId);
         } catch (Exception e) {
-            log.error("There was an error creating the server rpc {}", serverId);
+            log.error("There was an error creating the server rpc {} {}", serverId, e);
             return String.format("The port is not accepting messages: %s: ", serverId) + e.getMessage();
         }
 
@@ -81,6 +80,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         }
 
         synchronized (serversLockingLock) {
+            log.info("Entering add server synchronization with sending server {}", sendingServerId);
             // Send locks to all the servers
             ServerLockUtil.lock(rpcs);
 
