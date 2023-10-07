@@ -15,4 +15,7 @@ public interface ServerRPC {
     boolean unlock();
 
     String sendValuesToServer(int serverId);
+
+    boolean alive();
+
 }
