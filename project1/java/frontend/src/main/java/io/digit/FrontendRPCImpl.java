@@ -109,9 +109,11 @@ public class FrontendRPCImpl implements FrontendRPC {
             if (ServersList.servers.isEmpty()) {
                 return "ERR_NOSERVERS";
             }
-            return "[" + ServersList.servers.keySet().stream().sorted()
+
+            return ServersList.servers.keySet().stream()
+                    .sorted()
                     .map(Object::toString)
-                    .collect(Collectors.joining(" ")) + "]";
+                    .collect(Collectors.joining(" "));
         }
     }
 

@@ -8,9 +8,7 @@ import java.util.Map.Entry;
 
 @Slf4j
 public class HeartBeat implements Runnable{
-
     private final int heartbeatTimePeriod = 10;
-
 
     @Override
     public void run() {

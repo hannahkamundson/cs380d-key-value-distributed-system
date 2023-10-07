@@ -29,10 +29,13 @@ public class App {
             log.info("Starting the server");
             webServer.start();
             log.info("Server started");
+            HeartBeat h = new HeartBeat();
+            Thread t = new Thread(h);
+            log.info("Starting the heartbeats.");
+            t.start();
         } catch (Exception e) {
             log.error("Frontend had an error {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
-
     }
 }
