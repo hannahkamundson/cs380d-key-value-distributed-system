@@ -6,8 +6,7 @@ import io.digit.server.ServerRPCClient;
 import io.digit.server.ServerSelector;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -109,7 +108,18 @@ public class FrontendRPCImpl implements FrontendRPC {
     @Override
     public String listServer() {
         log.info("Starting to get the list of servers.");
-        return "[" + ServersList.servers.keySet().stream().map(Object::toString).collect(Collectors.joining(" ")) + "]";
+        //return "[" + ServersList.servers.keySet().stream().map(Object::toString).collect(Collectors.joining(" ")) + "]"
+        ArrayList<Integer> serverIdList = new ArrayList<Integer>();
+        for (Map.Entry<Integer,ServerRPC> entry : ServersList.servers.entrySet()){
+            serverIdList.add(entry.getKey());
+        }
+        Collections.sort(serverIdList);
+
+        StringBuilder serverList = new StringBuilder();
+        for (int i = 0; i <serverIdList.size(); i++){
+            serverList.append(Integer.toString(serverIdList.get(i)));
+        }
+        return serverList.toString();
     }
 
     @Override
