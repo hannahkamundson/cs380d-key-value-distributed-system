@@ -30,5 +30,10 @@ public class App {
         xmlRpcServer.setHandlerMapping(propertyHandlerMapping);
         log.info("Starting the server");
         webServer.start();
+
+        HeartBeat h = new HeartBeat();
+        Thread t = new Thread(h);
+        log.info("Starting the heartbeats.");
+        t.start();
     }
 }
