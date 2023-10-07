@@ -34,19 +34,23 @@ public class FrontendRPCImpl implements FrontendRPC {
 
     @Override
     public String get(int key) {
+        log.info("Starting getting key's value {}", key);
         int serverId = ServerSelector.select(key, ServersList.servers.keySet());
+        log.info("Completed getting key's value {}", key);
         return ServersList.servers.get(serverId).get(key);
     }
 
     @Override
     public String printKVPairs(int serverId) {
+        log.info("Starting to ask server to print key-value pairs {}", serverId);
         ServerRPC serverRpc = ServersList.servers.get(serverId);
 
         // Make sure the server exists
         if (serverRpc == null) {
+            log.info("Checking whether the server is registered before asking to print.");
             return String.format("The server is not registered: %s", serverId);
         }
-
+        log.info("Successfully requested the server to print key-value pairs {}", serverId);
         return serverRpc.printKVPairs();
     }
 
@@ -61,6 +65,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         ServerRPC serverRpc;
 
         try {
+            log.info("Starting to create a server {}", serverId);
             serverRpc = ServerRPCClient.create(serverId);
         } catch (Exception e) {
             log.error("There was an error creating the server rpc {} {}", serverId, e);
@@ -84,12 +89,14 @@ public class FrontendRPCImpl implements FrontendRPC {
             // Send locks to all the servers
             ServerLockUtil.lock(rpcs);
 
+            log.info("Starting to send all the data to the new server {}", serverId);
             // Tell one server to send all data to other server
             ServersList.servers.get(sendingServerId.get()).sendValuesToServer(serverId);
 
             // Create the RPC client for the new port
             ServersList.servers.put(serverId, serverRpc);
 
+            log.info("Unlocking all servers.");
             // Unlock all servers
             ServerLockUtil.unlock(rpcs);
         }
@@ -101,13 +108,16 @@ public class FrontendRPCImpl implements FrontendRPC {
     
     @Override
     public String listServer() {
+        log.info("Starting to get the list of servers.");
         return "[" + ServersList.servers.keySet().stream().map(Object::toString).collect(Collectors.joining(" ")) + "]";
     }
 
     @Override
     public String shutdownServer(int serverId) {
+        log.info("Starting to shut down server {}", serverId);
         ServerRPC serverRpc = ServersList.servers.get(serverId);
 
+        log.info("Checking the server exist to be shut down {}", serverId);
         // Male sure the server exists
         if (serverRpc == null) {
             return String.format("The server is not registered: %s", serverId);
@@ -117,6 +127,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         String message = serverRpc.shutdownServer();
         ServersList.servers.remove(serverId);
 
+        log.info("Seccussfully shut down server {}", serverId);
         return message;
     }
 
