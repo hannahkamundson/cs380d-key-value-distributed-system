@@ -34,4 +34,5 @@ public interface FrontendRPC {
      * corresponding server terminate normally.
      */
     String shutdownServer(int serverId);
+
 }

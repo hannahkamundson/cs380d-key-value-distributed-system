@@ -56,7 +56,8 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public String shutdownServer() {
-        return "Receive a request for a normal shutdown";
+        App.webServer.shutdown();
+        return "Success";
     }
 
     @Override
@@ -91,5 +92,10 @@ public class ServerRPCImpl implements ServerRPC {
 
         log.info("Successfully sent values to the server ID {}", serverId);
         return "Success";
+    }
+
+    @Override
+    public boolean alive() {
+        return true;
     }
 }

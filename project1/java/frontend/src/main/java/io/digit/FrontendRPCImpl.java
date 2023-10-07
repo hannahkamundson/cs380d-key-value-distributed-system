@@ -1,20 +1,18 @@
 package io.digit;
 
+import io.digit.server.ServerLockUtil;
 import io.digit.server.ServerRPC;
 import io.digit.server.ServerRPCClient;
-import io.digit.server.ServerLockUtil;
 import io.digit.server.ServerSelector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class FrontendRPCImpl implements FrontendRPC {
-    private final Map<Integer, ServerRPC> servers = new ConcurrentHashMap<>();
+   // private final Map<Integer, ServerRPC> servers = new ConcurrentHashMap<>();
 
     /**
      * Don't try to lock the servers more than once at a time
@@ -27,7 +25,7 @@ public class FrontendRPCImpl implements FrontendRPC {
         // TODO do we need to do a copy of this?
         // TODO: what happens if a server dies in the middle of this?
         synchronized (serversLockingLock) {
-            ServerLockUtil.runWithLock(servers.values(), rpc -> rpc.put(key, value));
+            ServerLockUtil.runWithLock(ServersList.servers.values(), rpc -> rpc.put(key, value));
         }
 
         log.info("Completed putting key value {} {}", key, value);
@@ -36,13 +34,13 @@ public class FrontendRPCImpl implements FrontendRPC {
 
     @Override
     public String get(int key) {
-        int serverId = ServerSelector.select(key, servers.keySet());
-        return servers.get(serverId).get(key);
+        int serverId = ServerSelector.select(key, ServersList.servers.keySet());
+        return ServersList.servers.get(serverId).get(key);
     }
 
     @Override
     public String printKVPairs(int serverId) {
-        ServerRPC serverRpc = servers.get(serverId);
+        ServerRPC serverRpc = ServersList.servers.get(serverId);
 
         // Make sure the server exists
         if (serverRpc == null) {
@@ -56,8 +54,8 @@ public class FrontendRPCImpl implements FrontendRPC {
     public String addServer(int serverId) {
         log.info("Adding server {}", serverId);
         // Make sure we aren't overwriting a server
-        if (servers.containsKey(serverId)) {
             log.info("The server already had the server id {}", serverId);
+        if (ServersList.servers.containsKey(serverId)) {
             return String.format("The server already exists: %s", serverId);
         }
 
@@ -70,14 +68,14 @@ public class FrontendRPCImpl implements FrontendRPC {
             return String.format("The port is not accepting messages: %s: ", serverId) + e.getMessage();
         }
 
-        Collection<ServerRPC> rpcs = servers.values();
+        Collection<ServerRPC> rpcs = ServersList.servers.values();
 
         // Make sure we have another server
-        Optional<Integer> sendingServerId = servers.keySet().stream().findFirst();
+        Optional<Integer> sendingServerId = ServersList.servers.keySet().stream().findFirst();
 
         // If there aren't any other servers, we don't need to move data over
         if (sendingServerId.isEmpty()) {
-            servers.put(serverId, serverRpc);
+            ServersList.servers.put(serverId, serverRpc);
             log.info("Successfully added server {}", serverId);
             return "Success";
         }
@@ -87,10 +85,10 @@ public class FrontendRPCImpl implements FrontendRPC {
             ServerLockUtil.lock(rpcs);
 
             // Tell one server to send all data to other server
-            servers.get(sendingServerId.get()).sendValuesToServer(serverId);
+            ServersList.servers.get(sendingServerId.get()).sendValuesToServer(serverId);
 
             // Create the RPC client for the new port
-            servers.put(serverId, serverRpc);
+            ServersList.servers.put(serverId, serverRpc);
 
             // Unlock all servers
             ServerLockUtil.unlock(rpcs);
@@ -103,12 +101,12 @@ public class FrontendRPCImpl implements FrontendRPC {
     
     @Override
     public String listServer() {
-        return "[" + servers.keySet().stream().map(Object::toString).collect(Collectors.joining(" ")) + "]";
+        return "[" + ServersList.servers.keySet().stream().map(Object::toString).collect(Collectors.joining(" ")) + "]";
     }
 
     @Override
     public String shutdownServer(int serverId) {
-        ServerRPC serverRpc = servers.get(serverId);
+        ServerRPC serverRpc = ServersList.servers.get(serverId);
 
         // Male sure the server exists
         if (serverRpc == null) {
@@ -117,8 +115,10 @@ public class FrontendRPCImpl implements FrontendRPC {
 
         // Shut it down before removing it from our list and then remove it
         String message = serverRpc.shutdownServer();
-        servers.remove(serverId);
+        ServersList.servers.remove(serverId);
 
         return message;
     }
+
+
 }

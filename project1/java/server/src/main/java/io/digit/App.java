@@ -21,6 +21,7 @@ import java.util.Arrays;
 public class App {
     private static final int Base_Port = 9000;
     private static int serverId = 0;
+    static WebServer webServer = null;
 
     // TODO: Do we want it to die when there is an exception? I'd think not
     public static void main(String[] args) throws XmlRpcException, IOException {
@@ -50,7 +51,7 @@ public class App {
         propertyHandlerMapping.addHandler("default", ServerRPC.class);
 
         // Start the server and add the handler mapping
-        WebServer webServer = new WebServer(ServerRPCClient.serverPort(serverId));
+        webServer = new WebServer(ServerRPCClient.serverPort(serverId));
         XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
 
         xmlRpcServer.setHandlerMapping(propertyHandlerMapping);
