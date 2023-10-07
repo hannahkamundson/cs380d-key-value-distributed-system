@@ -1,6 +1,7 @@
 package io.digit;
 
 import io.digit.server.ServerRPC;
+import io.digit.server.ServersList;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map.Entry;
@@ -9,7 +10,6 @@ import java.util.Map.Entry;
 public class HeartBeat implements Runnable{
 
     private final int heartbeatTimePeriod = 10;
-    //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(ServersList.servers.size());
 
 
     @Override

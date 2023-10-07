@@ -17,12 +17,14 @@ public class ServerRPCClient {
     public static ServerRPC create(int serverId) throws MalformedURLException {
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
             int serverPort = ServerRPCClient.serverPort(serverId);
-            config.setServerURL(new URL(BASE_HOST +  ":" + String.valueOf(serverPort)));
+            config.setServerURL(new URL(BASE_HOST +  ":" + String.valueOf(serverPort) + "/xmlrpc"));
             config.setEnabledForExtensions(true);
+            config.setConnectionTimeout(0);
+            config.setReplyTimeout(0);
             XmlRpcClient client = new XmlRpcClient();
             client.setConfig(config);
             ClientFactory factory = new ClientFactory(client);
-            return (ServerRPC) factory.newInstance(ServerRPC.class);
+        return (ServerRPC) factory.newInstance(ServerRPC.class);
     }
 
     public static int serverPort(int serverId) {

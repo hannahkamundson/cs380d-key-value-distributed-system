@@ -1,10 +1,10 @@
 package io.digit;
 
+import io.digit.server.Retry;
 import io.digit.server.ServerRPC;
 import io.digit.server.ServerRPCClient;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,6 +13,8 @@ public class ServerRPCImpl implements ServerRPC {
 
     private final Map<Integer, Integer> data = new ConcurrentHashMap<>();
     private static boolean isLocked = false;
+
+    private static final Object canWriteLock = new Object();
 
     @Override
     public String put(int key, int value) {
@@ -28,7 +30,9 @@ public class ServerRPCImpl implements ServerRPC {
         while (isLocked) {
             try {
                 log.info("Waiting until lock opens");
-                wait();
+                synchronized(canWriteLock) {
+                    canWriteLock.wait();
+                }
             } catch (InterruptedException e) {
                 log.info("Runtime Err while waiting for lock to open during get");
                 throw new RuntimeException(e);
@@ -38,9 +42,9 @@ public class ServerRPCImpl implements ServerRPC {
         Integer value = data.get(key);
         String readKey;
         if (value == null){
-            readKey = String.format("Key %s does not have a value yet!", key);
+            readKey = "ERR_KEY";
         } else {
-            readKey = String.format("Receive a get request: Key = %s, value=%s", key, value);
+            readKey = String.format("%s:%s", key, value);
         }
         log.info("Completed getting key's value {}", key);
         return readKey;
@@ -49,6 +53,17 @@ public class ServerRPCImpl implements ServerRPC {
     @Override
     public String printKVPairs() {
         log.info("Starting to print key-value pairs");
+        while (isLocked) {
+            try {
+                log.info("Waiting until lock opens for kv pairs");
+                synchronized(canWriteLock) {
+                    canWriteLock.wait();
+                }
+            } catch (InterruptedException e) {
+                log.info("Runtime Err while waiting for lock to open during kv pairs print");
+                throw new RuntimeException(e);
+            }
+        }
         StringBuilder keyValues = new StringBuilder();
         for (Map.Entry<Integer,Integer> entry : data.entrySet()){
             String key = Integer.toString(entry.getKey());
@@ -62,9 +77,6 @@ public class ServerRPCImpl implements ServerRPC {
 
     @Override
     public String shutdownServer() {
-        log.info("Starting shutting down the server");
-        App.webServer.shutdown();
-        log.info("Completed shutting down the server");
         return "Success";
     }
 
@@ -81,7 +93,14 @@ public class ServerRPCImpl implements ServerRPC {
     public boolean unlock() {
         log.info("Unlocking the system");
         isLocked = false;
-        notifyAll();
+        try {
+            synchronized (canWriteLock) {
+                log.info("Notifying all threads in can write lock");
+                canWriteLock.notifyAll();
+            }
+        } catch (Exception e) {
+            log.error("Issue notifying {}", e.getMessage(), e);
+        }
         log.info("Successfully unlocked the system");
         return true;
     }
@@ -92,11 +111,14 @@ public class ServerRPCImpl implements ServerRPC {
         try {
             ServerRPC newServer = ServerRPCClient.create(serverId);
             log.info("Starting to send the values to the new server {}", serverId);
+            log.info("There are this number of values to send {}", data.size());
             for (Map.Entry<Integer,Integer> entry : data.entrySet()){
-                newServer.put(entry.getKey(),entry.getValue());
+                log.info("Submitting key {}", entry.getKey());
+                Retry.run(() -> newServer.put(entry.getKey(),entry.getValue()));
+                log.info("Submitted key {}", entry.getKey());
             }
-        } catch (MalformedURLException e) {
-            log.info("Runtime Err while trying to send values to new server. {}", serverId);
+        } catch (Exception e) {
+            log.error("Runtime Err while trying to send values to new server. {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
