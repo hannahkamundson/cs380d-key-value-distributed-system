@@ -16,12 +16,14 @@ public class HeartBeat implements Runnable{
         while (true) {
             for (Entry<Integer, ServerRPC> entry : ServersList.servers.entrySet()){
                 log.info("Checking if server is alive {}", entry.getValue());
+                // Declaring a server is died when there is no respond for a heartbeat (after the set time period)
                 if (!entry.getValue().alive()){
                     ServersList.servers.remove(entry.getKey());
                 }
             }
             try {
                 log.info("Waiting until the next heartbeat.");
+                // Wait time between sending two heatbeats
                 Thread.sleep(heartbeatTimePeriod);
             } catch (InterruptedException e) {
                 log.info("Runtime Err during waiting time for the next heartbeat");

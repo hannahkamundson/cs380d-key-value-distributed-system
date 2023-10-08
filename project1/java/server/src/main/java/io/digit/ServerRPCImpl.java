@@ -27,6 +27,7 @@ public class ServerRPCImpl implements ServerRPC {
     @Override
     public String get(int key) {
         log.info("Starting getting key's value {}", key);
+        // Make sure there are no other uncompleted writes exist
         while (isLocked) {
             try {
                 log.info("Waiting until lock opens");
@@ -53,6 +54,7 @@ public class ServerRPCImpl implements ServerRPC {
     @Override
     public String printKVPairs() {
         log.info("Starting to print key-value pairs");
+        // Make sure there is no uncompleted write happening
         while (isLocked) {
             try {
                 log.info("Waiting until lock opens for kv pairs");
@@ -68,7 +70,8 @@ public class ServerRPCImpl implements ServerRPC {
         for (Map.Entry<Integer,Integer> entry : data.entrySet()){
             String key = Integer.toString(entry.getKey());
             String value = Integer.toString(entry.getValue());
-            keyValues.append("key = ").append(key).append(" ,value = ").append(value);
+            //keyValues.append("key = ").append(key).append(" ,value = ").append(value);
+            keyValues.append(key).append(":").append(value);
         }
         log.info("Completed storing key-value pairs as string");
         return keyValues.toString();
@@ -108,6 +111,7 @@ public class ServerRPCImpl implements ServerRPC {
     @Override
     public String sendValuesToServer(int serverId) {
         log.info("Sending values to the server ID {}", serverId);
+        // Sending all existing key-value pairs to the newly added server
         try {
             ServerRPC newServer = ServerRPCClient.create(serverId);
             log.info("Starting to send the values to the new server {}", serverId);

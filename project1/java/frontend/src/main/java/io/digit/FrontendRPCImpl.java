@@ -30,7 +30,18 @@ public class FrontendRPCImpl implements FrontendRPC {
     public String get(int key) {
         log.info("Starting getting key's value {}", key);
         int serverId = ServerSelector.select(key, ServersList.servers.keySet());
-        String value = ServersList.servers.get(serverId).get(key);
+        String value;
+
+        // Make sure server exists
+        if (ServersList.servers.get(serverId) == null) {
+            log.info("Checking server exists before getting value {} {}", serverId, key);
+            value = "ERR_NOEXIST";
+        } else {
+            log.info("Getting the key's value from the existing server {}", serverId);
+            value = ServersList.servers.get(serverId).get(key);
+            log.info("Completed getting {}", value);
+        }
+        //String value = ServersList.servers.get(serverId).get(key);
         log.info("Completed getting {}", value);
         return value;
     }
