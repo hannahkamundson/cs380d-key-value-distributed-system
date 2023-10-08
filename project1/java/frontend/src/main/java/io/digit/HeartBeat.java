@@ -1,5 +1,6 @@
 package io.digit;
 
+import io.digit.server.Retry;
 import io.digit.server.ServerRPC;
 import io.digit.server.ServersList;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,26 @@ public class HeartBeat implements Runnable{
         log.info("Starting to send heartbeats to everyone");
         while (true) {
             for (Entry<Integer, ServerRPC> entry : ServersList.servers.entrySet()){
+<<<<<<< HEAD
                 log.info("Checking if server is alive {}", entry.getValue());
                 // Declaring a server is died when there is no respond for a heartbeat (after the set time period)
                 if (!entry.getValue().alive()){
                     ServersList.servers.remove(entry.getKey());
+=======
+                log.info("Checking if server is alive {}", entry.getKey());
+                boolean isAlive = false;
+
+                try {
+                    isAlive = Retry.run(() -> entry.getValue().alive());
+                } catch (Exception e) {
+                    // If it isn't working, keep it not alive
+                }
+
+                if (!isAlive){
+                    synchronized (ServersList.serversLock) {
+                        ServersList.servers.remove(entry.getKey());
+                    }
+>>>>>>> origin/master
                 }
             }
             try {
