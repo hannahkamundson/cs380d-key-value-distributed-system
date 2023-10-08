@@ -8,17 +8,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class FrontendRPCImpl implements FrontendRPC {
-    /**
-     * Don't try to lock the servers more than once at a time
-     */
-    private final Object serversLockingLock = new Object();
-
     @Override
     public String put(int key, int value) {
         log.info("Starting putting key value {} {}", key, value);
         // TODO do we need to do a copy of this?
         // TODO: what happens if a server dies in the middle of this?
-        synchronized (serversLockingLock) {
+        synchronized (ServersList.serversLock) {
             ServerLockUtil.runWithLock(rpc -> rpc.put(key, value));
         }
 
@@ -72,14 +67,14 @@ public class FrontendRPCImpl implements FrontendRPC {
 
         // If there aren't any other servers, we don't need to move data over
         if (sendingServerId.isEmpty()) {
-            synchronized (serversLockingLock) {
+            synchronized (ServersList.serversLock) {
                 ServersList.servers.put(serverId, serverRpc);
             }
             log.info("Successfully added server {}", serverId);
             return "Success";
         }
 
-        synchronized (serversLockingLock) {
+        synchronized (ServersList.serversLock) {
             log.info("Entering add server synchronization with sending server {}", sendingServerId);
             // Send locks to all the servers
             ServerLockUtil.lock();
@@ -105,7 +100,7 @@ public class FrontendRPCImpl implements FrontendRPC {
     @Override
     public String listServer() {
         log.info("Starting to get the list of servers.");
-        synchronized (serversLockingLock) {
+        synchronized (ServersList.serversLock) {
             if (ServersList.servers.isEmpty()) {
                 return "ERR_NOSERVERS";
             }
@@ -121,7 +116,7 @@ public class FrontendRPCImpl implements FrontendRPC {
     public String shutdownServer(int serverId) {
         log.info("Starting to shut down server {}", serverId);
         String message;
-        synchronized (serversLockingLock) {
+        synchronized (ServersList.serversLock) {
             ServerRPC serverRpc = ServersList.servers.get(serverId);
 
             log.info("Checking the server exist to be shut down {}", serverId);

@@ -65,10 +65,11 @@ public class ServerRPCImpl implements ServerRPC {
             }
         }
         StringBuilder keyValues = new StringBuilder();
+
         for (Map.Entry<Integer,Integer> entry : data.entrySet()){
             String key = Integer.toString(entry.getKey());
             String value = Integer.toString(entry.getValue());
-            keyValues.append("key = ").append(key).append(" ,value = ").append(value);
+            keyValues.append(key).append(":").append(value).append("\n");
         }
         log.info("Completed storing key-value pairs as string");
         return keyValues.toString();
