@@ -16,12 +16,6 @@ public class HeartBeat implements Runnable{
         log.info("Starting to send heartbeats to everyone");
         while (true) {
             for (Entry<Integer, ServerRPC> entry : ServersList.servers.entrySet()){
-<<<<<<< HEAD
-                log.info("Checking if server is alive {}", entry.getValue());
-                // Declaring a server is died when there is no respond for a heartbeat (after the set time period)
-                if (!entry.getValue().alive()){
-                    ServersList.servers.remove(entry.getKey());
-=======
                 log.info("Checking if server is alive {}", entry.getKey());
                 boolean isAlive = false;
 
@@ -35,7 +29,6 @@ public class HeartBeat implements Runnable{
                     synchronized (ServersList.serversLock) {
                         ServersList.servers.remove(entry.getKey());
                     }
->>>>>>> origin/master
                 }
             }
             try {
